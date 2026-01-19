@@ -174,14 +174,6 @@ class MiniPlugin_Plugin_Info
         // Mark as external to prevent wordpress.org API calls.
         $info->external = true;
 
-        // Check if plugin is installed and active - this controls the button display.
-        if (!function_exists('is_plugin_active')) {
-            require_once ABSPATH . 'wp-admin/includes/plugin.php';
-        }
-        
-        $info->installed = true;
-        $info->active    = is_plugin_active($this->plugin_file);
-
         return $info;
     }
 
