@@ -278,7 +278,7 @@ class MiniPlugin_Plugin_Info
 
         // Unordered lists.
         $html = preg_replace('/^- (.+)$/m', '<li>$1</li>', $html);
-        $html = preg_replace('/(<li>.*<\/li>\n?)+/s', '<ul style="padding-left: 2em;">$0</ul>', $html);
+        $html = preg_replace('/(<li>.*<\/li>\n?)+/s', '<ul>$0</ul>', $html);
 
         // Ordered lists.
         $html = preg_replace('/^\d+\. (.+)$/m', '<li>$1</li>', $html);
