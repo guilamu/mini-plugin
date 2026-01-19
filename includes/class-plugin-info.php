@@ -175,10 +175,12 @@ class MiniPlugin_Plugin_Info
         $info->external = true;
 
         // Check if plugin is installed and active - this controls the button display.
-        if (function_exists('is_plugin_active')) {
-            $info->installed = true;
-            $info->active    = is_plugin_active($this->plugin_file);
+        if (!function_exists('is_plugin_active')) {
+            require_once ABSPATH . 'wp-admin/includes/plugin.php';
         }
+        
+        $info->installed = true;
+        $info->active    = is_plugin_active($this->plugin_file);
 
         return $info;
     }
