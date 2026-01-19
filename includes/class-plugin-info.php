@@ -30,7 +30,7 @@ class MiniPlugin_Plugin_Info
      *
      * @var string
      */
-    private $plugin_slug = 'miniplugin';
+    private $plugin_slug = 'mini-plugin';
 
     /**
      * Plugin file path relative to plugins directory.
