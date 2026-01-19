@@ -276,14 +276,60 @@ class MiniPlugin_Plugin_Info
         // Links.
         $html = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank">$1</a>', $html);
 
-        // Ordered lists - process first with a temporary marker to avoid ul/ol conflicts.
-        $html = preg_replace('/^(\d+)\. (.+)$/m', '<oli>$2</oli>', $html);
-        $html = preg_replace('/(<oli>.*<\/oli>\n?)+/s', '<ol>$0</ol>', $html);
-        $html = str_replace(array('<oli>', '</oli>'), array('<li>', '</li>'), $html);
+        // Process lists line by line to ensure proper wrapping
+        $lines = explode("\n", $html);
+        $result_lines = array();
+        $in_ol = false;
+        $in_ul = false;
 
-        // Unordered lists.
-        $html = preg_replace('/^- (.+)$/m', '<li>$1</li>', $html);
-        $html = preg_replace('/(<li>.*<\/li>\n?)+/s', '<ul style="margin-left: 2em;">$0</ul>', $html);
+        foreach ($lines as $line) {
+            // Check for ordered list item
+            if (preg_match('/^(\d+)\. (.+)$/', $line, $matches)) {
+                if (!$in_ol) {
+                    $result_lines[] = '<ol>';
+                    $in_ol = true;
+                }
+                if ($in_ul) {
+                    $result_lines[] = '</ul>';
+                    $in_ul = false;
+                }
+                $result_lines[] = '<li>' . $matches[2] . '</li>';
+            }
+            // Check for unordered list item
+            elseif (preg_match('/^- (.+)$/', $line, $matches)) {
+                if (!$in_ul) {
+                    $result_lines[] = '<ul>';
+                    $in_ul = true;
+                }
+                if ($in_ol) {
+                    $result_lines[] = '</ol>';
+                    $in_ol = false;
+                }
+                $result_lines[] = '<li>' . $matches[1] . '</li>';
+            }
+            // Not a list item
+            else {
+                if ($in_ol) {
+                    $result_lines[] = '</ol>';
+                    $in_ol = false;
+                }
+                if ($in_ul) {
+                    $result_lines[] = '</ul>';
+                    $in_ul = false;
+                }
+                $result_lines[] = $line;
+            }
+        }
+
+        // Close any open lists
+        if ($in_ol) {
+            $result_lines[] = '</ol>';
+        }
+        if ($in_ul) {
+            $result_lines[] = '</ul>';
+        }
+
+        $html = implode("\n", $result_lines);
 
         // Paragraphs (lines not starting with HTML tags).
         $lines = explode("\n", $html);
