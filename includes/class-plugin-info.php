@@ -30,7 +30,7 @@ class MiniPlugin_Plugin_Info
      *
      * @var string
      */
-    private $plugin_slug = 'mini-plugin';
+    private $plugin_slug = 'mini-plugin-main';
 
     /**
      * Plugin file path relative to plugins directory.
@@ -68,7 +68,7 @@ class MiniPlugin_Plugin_Info
     public function __construct()
     {
         // Dynamically determine the plugin file path.
-        $this->plugin_file = plugin_basename(MINIPLUGIN_PLUGIN_DIR . 'miniplugin.php');
+        $this->plugin_file = 'mini-plugin-main/miniplugin.php';
 
         add_filter('plugins_api', array($this, 'plugin_info'), 20, 3);
         add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
