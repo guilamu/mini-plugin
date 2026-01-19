@@ -276,9 +276,9 @@ class MiniPlugin_Plugin_Info
         // Links.
         $html = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank">$1</a>', $html);
 
-        // Unordered lists - add inline style for proper bullet positioning.
+        // Unordered lists.
         $html = preg_replace('/^- (.+)$/m', '<li>$1</li>', $html);
-        $html = preg_replace('/(<li>.*<\/li>\n?)+/s', '<ul style="list-style-position: inside; padding-left: 0; margin-left: 1em;">$0</ul>', $html);
+        $html = preg_replace('/(<li>.*<\/li>\n?)+/s', '<ul style="padding-left: 2em;">$0</ul>', $html);
 
         // Ordered lists.
         $html = preg_replace('/^\d+\. (.+)$/m', '<li>$1</li>', $html);
