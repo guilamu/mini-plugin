@@ -122,6 +122,7 @@ class MiniPlugin_Plugin_Info
         // Basic plugin info.
         $info->name           = $plugin_data['Name'];
         $info->slug           = $this->plugin_slug;
+        $info->plugin         = $this->plugin_file;
         $info->version        = $plugin_data['Version'];
         $info->author         = $plugin_data['Author'];
         $info->author_profile = $plugin_data['AuthorURI'];
