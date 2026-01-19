@@ -72,7 +72,6 @@ class MiniPlugin_Plugin_Info
 
         add_filter('plugins_api', array($this, 'plugin_info'), 20, 3);
         add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
-        add_filter('plugin_action_links_' . $this->plugin_file, array($this, 'plugin_action_links'), 10, 1);
         add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_updates'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_thickbox'));
     }
@@ -131,12 +130,17 @@ class MiniPlugin_Plugin_Info
         $info->requires_php   = $plugin_data['RequiresPHP'];
         $info->homepage       = $plugin_data['PluginURI'];
 
+        // Use description from README, fallback to plugin header description.
+        $description = ! empty($readme_data['description'])
+            ? $readme_data['description']
+            : '<p>' . esc_html($plugin_data['Description']) . '</p>';
+
         // Sections from README.
         $info->sections = array(
-            'description' => $readme_data['description'],
+            'description'  => $description,
             'installation' => $readme_data['installation'],
-            'changelog' => $readme_data['changelog'],
-            'faq' => $readme_data['faq'],
+            'changelog'    => $readme_data['changelog'],
+            'faq'          => $readme_data['faq'],
         );
 
         // Remove empty sections.
@@ -161,14 +165,20 @@ class MiniPlugin_Plugin_Info
             '2x' => '',
         );
 
-        // Last updated (use current time if not available).
+        // Last updated.
         $info->last_updated = gmdate('Y-m-d H:i:s');
 
         // Number of active installs (unknown for GitHub plugins).
         $info->active_installs = 0;
 
-        // External links.
+        // Mark as external to prevent wordpress.org API calls.
         $info->external = true;
+
+        // Check if plugin is installed and active - this controls the button display.
+        if (function_exists('is_plugin_active')) {
+            $info->installed = true;
+            $info->active    = is_plugin_active($this->plugin_file);
+        }
 
         return $info;
     }
@@ -245,7 +255,9 @@ class MiniPlugin_Plugin_Info
      */
     private function markdown_to_html($markdown)
     {
-        $html = $markdown;
+        // Normalize line endings (Windows CRLF to Unix LF).
+        $html = str_replace("\r\n", "\n", $markdown);
+        $html = str_replace("\r", "\n", $html);
 
         // Headers.
         $html = preg_replace('/^### (.+)$/m', '<h3>$1</h3>', $html);
@@ -328,36 +340,7 @@ class MiniPlugin_Plugin_Info
     }
 
     /**
-     * Add action links to the plugin row (left side).
-     *
-     * @since 1.0.0
-     *
-     * @param array $links Plugin action links.
-     * @return array Modified links.
-     */
-    public function plugin_action_links($links)
-    {
-        $details_link = sprintf(
-            '<a href="%s" class="thickbox open-plugin-details-modal" aria-label="%s" data-title="%s">%s</a>',
-            esc_url(
-                admin_url(
-                    'plugin-install.php?tab=plugin-information&plugin=' . $this->plugin_slug .
-                        '&TB_iframe=true&width=600&height=550'
-                )
-            ),
-            esc_attr(sprintf(__('More information about %s', 'miniplugin'), 'Mini Plugin')),
-            esc_attr('Mini Plugin'),
-            esc_html__('View details', 'miniplugin')
-        );
-
-        // Add at the end of action links.
-        $links['details'] = $details_link;
-
-        return $links;
-    }
-
-    /**
-     * Add custom links to the plugin row meta (right side).
+     * Add custom links to the plugin row meta (right side, under description).
      *
      * @since 1.0.0
      *
@@ -371,7 +354,22 @@ class MiniPlugin_Plugin_Info
             return $links;
         }
 
+        // View details link with thickbox modal.
+        $details_link = sprintf(
+            '<a href="%s" class="thickbox open-plugin-details-modal" aria-label="%s" data-title="%s">%s</a>',
+            esc_url(
+                admin_url(
+                    'plugin-install.php?tab=plugin-information&plugin=' . $this->plugin_slug .
+                        '&TB_iframe=true&width=600&height=550'
+                )
+            ),
+            esc_attr(sprintf(__('More information about %s', 'miniplugin'), 'Mini Plugin')),
+            esc_attr('Mini Plugin'),
+            esc_html__('View details', 'miniplugin')
+        );
+
         $custom_links = array(
+            $details_link,
             sprintf(
                 '<a href="%s" target="_blank">%s</a>',
                 esc_url('https://github.com/' . $this->github_owner . '/' . $this->github_repo),
