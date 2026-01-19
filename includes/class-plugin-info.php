@@ -276,12 +276,14 @@ class MiniPlugin_Plugin_Info
         // Links.
         $html = preg_replace('/\[([^\]]+)\]\(([^)]+)\)/', '<a href="$2" target="_blank">$1</a>', $html);
 
+        // Ordered lists - process first with a temporary marker to avoid ul/ol conflicts.
+        $html = preg_replace('/^(\d+)\. (.+)$/m', '<oli>$2</oli>', $html);
+        $html = preg_replace('/(<oli>.*<\/oli>\n?)+/s', '<ol>$0</ol>', $html);
+        $html = str_replace(array('<oli>', '</oli>'), array('<li>', '</li>'), $html);
+
         // Unordered lists.
         $html = preg_replace('/^- (.+)$/m', '<li>$1</li>', $html);
         $html = preg_replace('/(<li>.*<\/li>\n?)+/s', '<ul>$0</ul>', $html);
-
-        // Ordered lists.
-        $html = preg_replace('/^\d+\. (.+)$/m', '<li>$1</li>', $html);
 
         // Paragraphs (lines not starting with HTML tags).
         $lines = explode("\n", $html);
