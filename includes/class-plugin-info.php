@@ -336,7 +336,25 @@ class MiniPlugin_Plugin_Info
     {
         if ('plugins.php' === $hook) {
             add_thickbox();
+            add_action('admin_head', array($this, 'plugin_modal_styles'));
         }
+    }
+
+    /**
+     * Output custom styles for the plugin details modal.
+     *
+     * @since 1.0.0
+     */
+    public function plugin_modal_styles()
+    {
+?>
+        <style>
+            #plugin-information-content ul {
+                padding-left: 20px;
+                list-style-position: inside;
+            }
+        </style>
+<?php
     }
 
     /**
