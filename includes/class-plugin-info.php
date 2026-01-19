@@ -37,7 +37,7 @@ class MiniPlugin_Plugin_Info
      *
      * @var string
      */
-    private $plugin_file = 'miniplugin/miniplugin.php';
+    private $plugin_file;
 
     /**
      * GitHub repository owner.
@@ -67,6 +67,9 @@ class MiniPlugin_Plugin_Info
      */
     public function __construct()
     {
+        // Dynamically determine the plugin file path.
+        $this->plugin_file = plugin_basename(MINIPLUGIN_PLUGIN_DIR . 'miniplugin.php');
+
         add_filter('plugins_api', array($this, 'plugin_info'), 20, 3);
         add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
         add_filter('plugin_action_links_' . $this->plugin_file, array($this, 'plugin_action_links'), 10, 1);
