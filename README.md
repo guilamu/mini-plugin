@@ -1,0 +1,2 @@
+# mini-plugin
+test plugin
