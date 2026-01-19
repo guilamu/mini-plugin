@@ -69,7 +69,9 @@ class MiniPlugin_Plugin_Info
     {
         add_filter('plugins_api', array($this, 'plugin_info'), 20, 3);
         add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
+        add_filter('plugin_action_links_' . $this->plugin_file, array($this, 'plugin_action_links'), 10, 1);
         add_filter('pre_set_site_transient_update_plugins', array($this, 'check_for_updates'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_thickbox'));
     }
 
     /**
@@ -309,7 +311,50 @@ class MiniPlugin_Plugin_Info
     }
 
     /**
-     * Add custom links to the plugin row meta.
+     * Enqueue thickbox scripts for the plugin details modal.
+     *
+     * @since 1.0.0
+     *
+     * @param string $hook Current admin page hook.
+     */
+    public function enqueue_thickbox($hook)
+    {
+        if ('plugins.php' === $hook) {
+            add_thickbox();
+        }
+    }
+
+    /**
+     * Add action links to the plugin row (left side).
+     *
+     * @since 1.0.0
+     *
+     * @param array $links Plugin action links.
+     * @return array Modified links.
+     */
+    public function plugin_action_links($links)
+    {
+        $details_link = sprintf(
+            '<a href="%s" class="thickbox open-plugin-details-modal" aria-label="%s" data-title="%s">%s</a>',
+            esc_url(
+                admin_url(
+                    'plugin-install.php?tab=plugin-information&plugin=' . $this->plugin_slug .
+                        '&TB_iframe=true&width=600&height=550'
+                )
+            ),
+            esc_attr(sprintf(__('More information about %s', 'miniplugin'), 'Mini Plugin')),
+            esc_attr('Mini Plugin'),
+            esc_html__('View details', 'miniplugin')
+        );
+
+        // Add at the end of action links.
+        $links['details'] = $details_link;
+
+        return $links;
+    }
+
+    /**
+     * Add custom links to the plugin row meta (right side).
      *
      * @since 1.0.0
      *
