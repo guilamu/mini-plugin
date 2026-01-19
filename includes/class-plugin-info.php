@@ -336,13 +336,24 @@ class MiniPlugin_Plugin_Info
     {
         if ('plugins.php' === $hook) {
             add_thickbox();
-
-            // Override WordPress core h3 margin styling in plugin details modal.
-            wp_add_inline_style(
-                'thickbox',
-                '.plugin-install-php h3 { margin: 0 0 8px; }'
-            );
+            add_action('admin_head', array($this, 'plugin_modal_styles'));
         }
+    }
+
+    /**
+     * Output custom styles for the plugin details modal.
+     *
+     * @since 1.0.0
+     */
+    public function plugin_modal_styles()
+    {
+?>
+        <style>
+            .plugin-install-php h3 {
+                margin: 0 0 8px !important;
+            }
+        </style>
+<?php
     }
 
     /**
