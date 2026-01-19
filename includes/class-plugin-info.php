@@ -259,8 +259,8 @@ class MiniPlugin_Plugin_Info
         $html = str_replace("\r\n", "\n", $markdown);
         $html = str_replace("\r", "\n", $html);
 
-        // Headers.
-        $html = preg_replace('/^### (.+)$/m', '<h3>$1</h3>', $html);
+        // Headers - use h4 for ### to avoid WordPress core h3 margin styling.
+        $html = preg_replace('/^### (.+)$/m', '<h4>$1</h4>', $html);
         $html = preg_replace('/^## (.+)$/m', '<h2>$1</h2>', $html);
         $html = preg_replace('/^# (.+)$/m', '<h1>$1</h1>', $html);
 
@@ -336,24 +336,7 @@ class MiniPlugin_Plugin_Info
     {
         if ('plugins.php' === $hook) {
             add_thickbox();
-            add_action('admin_head', array($this, 'plugin_modal_styles'));
         }
-    }
-
-    /**
-     * Output custom styles for the plugin details modal.
-     *
-     * @since 1.0.0
-     */
-    public function plugin_modal_styles()
-    {
-?>
-        <style>
-            .plugin-install-php h3 {
-                margin: 0 0 8px !important;
-            }
-        </style>
-<?php
     }
 
     /**
